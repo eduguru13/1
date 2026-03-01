@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#6A11CB">
+  <meta name="description" content="EduGuru — Sri Lanka's premier education marketplace. Learn from the best teachers. Mobile-first platform for students and teachers.">
+  <meta name="keywords" content="education, courses, Sri Lanka, online learning, teachers, students, EduGuru">
+  <meta name="author" content="EduGuru">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="EduGuru — Learn From Sri Lanka's Best">
+  <meta property="og:description" content="Browse and enroll in courses from verified Sri Lankan teachers.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/images/og-image.png">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="EduGuru">
+
+  <title>EduGuru — Education Marketplace Sri Lanka</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="css/design-system.css">
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <!-- Inline critical styles -->
+  <style>
+    /* Loading screen */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+    #loading-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loading-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(106,17,203,0.35);
+      animation: logoFloat 2s ease-in-out infinite;
+    }
+    .loading-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+    .loading-brand {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      font-size: 28px;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .loading-bar-wrap {
+      width: 120px;
+      height: 3px;
+      background: var(--gray-100);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .loading-bar {
+      height: 100%;
+      background: var(--gradient);
+      border-radius: 99px;
+      animation: loadBar 1.5s ease-in-out infinite;
+    }
+    @keyframes loadBar {
+      0%   { width: 0%; margin-left: 0; }
+      50%  { width: 80%; margin-left: 0; }
+      100% { width: 0%; margin-left: 100%; }
+    }
+
+    /* Spin utility */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin 0.8s linear infinite; }
+
+    /* Auth page cleanup */
+    .auth-page #page-content {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    /* Form cleanup */
+    .photo-upload-wrap .photo-upload-placeholder { text-align: center; }
+
+    /* Custom scrollbar (desktop) */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(106,17,203,0.2); border-radius: 99px; }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-logo">
+      <img src="assets/icons/icon-512.png" alt="EduGuru">
+    </div>
+    <span class="loading-brand">EduGuru</span>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar"></div>
+    </div>
+  </div>
+
+  <!-- Main App Container -->
+  <div id="app"></div>
+
+  <!-- Main App Script (ES Module) -->
+  <script type="module" src="js/app.js"></script>
+
+  <!-- Hide loading screen once app is ready -->
+  <script>
+    window.addEventListener('route:changed', () => {
+      const screen = document.getElementById('loading-screen');
+      if (screen && !screen.classList.contains('fade-out')) {
+        screen.classList.add('fade-out');
+        setTimeout(() => screen.remove(), 500);
+      }
+    }, { once: true });
+
+    // Fallback: hide after 4s
+    setTimeout(() => {
+      const screen = document.getElementById('loading-screen');
+      if (screen) { screen.classList.add('fade-out'); setTimeout(() => screen.remove(), 500); }
+    }, 4000);
+
+    // Register Service Worker for PWA install
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .catch(() => {}); // Silently fail on localhost without HTTPS
+      });
+    }
+  </script>
+
+</body>
+</html>
